@@ -1,6 +1,6 @@
 // Admin API for /admin/: reads and saves links.json in the GitHub repo.
 // Every save is a commit, which makes Cloudflare Pages redeploy, so the public page stays a static file.
-// Needs two secrets in Cloudflare Pages: ADMIN_PASSWORD and GITHUB_TOKEN (fine-grained, Contents read/write on this repo).
+// Needs Cloudflare Pages variables ADMIN_USERNAME, ADMIN_PASSWORD and GITHUB_TOKEN (fine-grained, Contents read/write on this repo).
 
 const FILE_URL = 'https://api.github.com/repos/Andrepjt/ansaka/contents/links.json';
 const FIELDS = ['number', 'title', 'category', 'platform', 'badge', 'url'];
@@ -8,16 +8,21 @@ const PLATFORMS = ['shopee', 'tiktok', 'tokopedia', 'lazada', 'umum'];
 
 const json = (data, status = 200) => Response.json(data, { status });
 
-async function checkAccess(request, env) {
-    const missing = ['ADMIN_PASSWORD', 'GITHUB_TOKEN'].filter(name => !env[name]);
-    if (missing.length) return json({ error: `Secret ${missing.join(' dan ')} belum di-set di Cloudflare Pages.` }, 500);
-
-    // The admin page sends the password URI-encoded because header values must be ASCII.
-    const given = (request.headers.get('Authorization') || '').replace(/^Bearer /, '');
-    // Hash both sides so timingSafeEqual gets equal-length inputs.
+// Hash both sides so timingSafeEqual gets equal-length inputs.
+async function same(a, b) {
     const hash = text => crypto.subtle.digest('SHA-256', new TextEncoder().encode(text));
-    const ok = crypto.subtle.timingSafeEqual(await hash(given), await hash(encodeURIComponent(env.ADMIN_PASSWORD)));
-    return ok ? null : json({ error: 'Password salah.' }, 401);
+    return crypto.subtle.timingSafeEqual(await hash(a), await hash(b));
+}
+
+async function checkAccess(request, env) {
+    const missing = ['ADMIN_USERNAME', 'ADMIN_PASSWORD', 'GITHUB_TOKEN'].filter(name => !env[name]);
+    if (missing.length) return json({ error: `Variable ${missing.join(', ')} belum di-set di Cloudflare Pages.` }, 500);
+
+    // The admin page sends "user:pass" with each part URI-encoded: header values must be ASCII, and ":" can't appear inside a part.
+    const [user = '', pass = ''] = (request.headers.get('Authorization') || '').replace(/^Bearer /, '').split(':');
+    const okUser = await same(user, encodeURIComponent(env.ADMIN_USERNAME));
+    const okPass = await same(pass, encodeURIComponent(env.ADMIN_PASSWORD));
+    return okUser && okPass ? null : json({ error: 'Username atau password salah.' }, 401);
 }
 
 function github(env, init = {}) {

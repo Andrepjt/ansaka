@@ -22,28 +22,43 @@
 </head>
 
 <body class="bg-neutral-100 text-neutral-800 font-sans min-h-screen">
-    <div class="w-full max-w-[480px] mx-auto px-4 py-5">
+    <!-- Login -->
+    <section id="loginView" class="min-h-screen flex items-center justify-center px-4">
+        <form id="loginForm" class="w-full max-w-[360px] bg-white rounded-3xl border border-neutral-200 p-6 shadow-sm">
+            <div
+                class="w-16 h-16 mx-auto rounded-full bg-brand border-4 border-white text-white flex items-center justify-center text-lg font-extrabold shadow-[-3px_-3px_0_#25F4EE,3px_3px_0_#FE2C55]">
+                RA</div>
+            <h1 class="mt-4 text-center text-lg font-extrabold">Masuk Admin</h1>
+            <p class="mt-1 text-center text-xs text-neutral-500">Kelola link affiliate Rumah Ansaka</p>
+
+            <label class="block mt-6 text-xs font-semibold">Username
+                <input name="username" required autocomplete="username" autocapitalize="none" spellcheck="false"
+                    class="mt-1 w-full px-3 py-2.5 rounded-xl border border-neutral-300 text-base focus:outline-none focus:ring-2 focus:ring-brand">
+            </label>
+            <label class="block mt-3 text-xs font-semibold">Password
+                <input name="password" type="password" required autocomplete="current-password"
+                    class="mt-1 w-full px-3 py-2.5 rounded-xl border border-neutral-300 text-base focus:outline-none focus:ring-2 focus:ring-brand">
+            </label>
+
+            <p id="loginError" class="hidden mt-3 px-3 py-2 rounded-xl bg-red-100 text-red-800 text-xs font-semibold"></p>
+            <button id="loginBtn" class="mt-5 w-full py-3 rounded-xl bg-brand text-white text-sm font-bold disabled:opacity-50">Masuk</button>
+            <a href="/" class="block mt-4 text-center text-xs font-semibold text-neutral-500 hover:text-brand">← Kembali ke situs</a>
+        </form>
+    </section>
+
+    <div id="adminView" class="hidden w-full max-w-[480px] mx-auto px-4 py-5">
 
         <header class="flex items-center justify-between mb-4">
             <h1 class="text-base font-extrabold">Admin Rumah Ansaka</h1>
             <div class="flex gap-3 text-xs font-semibold">
                 <a href="/" target="_blank" class="text-neutral-500 hover:text-brand">Lihat situs ↗</a>
-                <button id="logoutBtn" onclick="logout()" class="hidden text-neutral-500 hover:text-brand">Keluar</button>
+                <button onclick="logout()" class="text-neutral-500 hover:text-brand">Keluar</button>
             </div>
         </header>
 
-        <!-- Login -->
-        <form id="loginForm" class="hidden bg-white rounded-2xl border border-neutral-200 p-4 shadow-sm">
-            <label class="block text-xs font-semibold">Password admin
-                <input name="password" type="password" required autocomplete="current-password"
-                    class="mt-1 w-full px-3 py-2.5 rounded-xl border border-neutral-300 text-base focus:outline-none focus:ring-2 focus:ring-brand">
-            </label>
-            <button class="mt-3 w-full py-2.5 rounded-xl bg-brand text-white text-sm font-bold">Masuk</button>
-        </form>
-
         <p id="status" class="hidden my-3 px-3 py-2 rounded-xl text-xs font-semibold"></p>
 
-        <main id="adminPanel" class="hidden">
+        <main id="adminPanel">
             <!-- Add / edit form -->
             <form id="itemForm" class="bg-white rounded-2xl border border-neutral-200 p-4 shadow-sm space-y-3">
                 <h2 id="formTitle" class="text-sm font-bold">Tambah link</h2>
@@ -110,13 +125,13 @@
         let links = [];
         let sha = null;
         let editingIndex = -1;
-        let password = '';
-        try { password = localStorage.getItem('adminPassword') || ''; } catch (e) { }
+        let auth = ''; // "user:pass", each part URI-encoded (see functions/admin/api.js)
+        try { auth = localStorage.getItem('adminAuth') || ''; } catch (e) { }
 
         async function api(method, body) {
             const res = await fetch('/admin/api', {
                 method,
-                headers: { Authorization: 'Bearer ' + encodeURIComponent(password), 'Content-Type': 'application/json' },
+                headers: { Authorization: 'Bearer ' + auth, 'Content-Type': 'application/json' },
                 body: body && JSON.stringify(body),
             });
             const data = await res.json().catch(() => ({ error: `Server error (${res.status}).` }));
@@ -131,37 +146,40 @@
         }
 
         function showLogin(message) {
-            $('loginForm').classList.remove('hidden');
-            $('adminPanel').classList.add('hidden');
-            $('logoutBtn').classList.add('hidden');
-            if (message) setStatus(message, 'error'); else $('status').className = 'hidden';
+            $('adminView').classList.add('hidden');
+            $('loginView').classList.remove('hidden');
+            $('loginError').textContent = message || '';
+            $('loginError').classList.toggle('hidden', !message);
         }
 
         async function start() {
-            setStatus('Memuat data...');
+            $('loginBtn').disabled = true;
+            $('loginBtn').textContent = 'Memuat...';
             try {
                 const data = await api('GET');
                 links = data.links;
                 sha = data.sha;
             } catch (err) {
                 if (err.status === 401) {
-                    try { localStorage.removeItem('adminPassword'); } catch (e) { }
-                    return showLogin(password ? err.message : '');
+                    try { localStorage.removeItem('adminAuth'); } catch (e) { }
                 }
-                return setStatus(err.message, 'error');
+                return showLogin(err.message);
+            } finally {
+                $('loginBtn').disabled = false;
+                $('loginBtn').textContent = 'Masuk';
             }
-            try { localStorage.setItem('adminPassword', password); } catch (e) { }
-            $('loginForm').classList.add('hidden');
-            $('adminPanel').classList.remove('hidden');
-            $('logoutBtn').classList.remove('hidden');
+            try { localStorage.setItem('adminAuth', auth); } catch (e) { }
+            $('loginView').classList.add('hidden');
+            $('adminView').classList.remove('hidden');
             $('status').className = 'hidden';
             render();
             resetForm();
         }
 
         function logout() {
-            password = '';
-            try { localStorage.removeItem('adminPassword'); } catch (e) { }
+            auth = '';
+            try { localStorage.removeItem('adminAuth'); } catch (e) { }
+            $('loginForm').elements.password.value = '';
             showLogin();
         }
 
@@ -258,11 +276,12 @@
 
         $('loginForm').onsubmit = event => {
             event.preventDefault();
-            password = event.target.elements.password.value;
+            const fields = event.target.elements;
+            auth = encodeURIComponent(fields.username.value.trim()) + ':' + encodeURIComponent(fields.password.value);
             start();
         };
 
-        if (password) start(); else showLogin();
+        if (auth) start();
     </script>
 </body>
 
