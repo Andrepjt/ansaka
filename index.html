@@ -23,6 +23,9 @@
                 extend: {
                     fontFamily: {
                         sans: ['Inter', 'sans-serif'],
+                    },
+                    colors: {
+                        brand: { DEFAULT: '#FE2C55', cyan: '#25F4EE' }
                     }
                 }
             }
@@ -47,31 +50,31 @@
 </head>
 
 <body
-    class="bg-slate-200/70 dark:bg-slate-950 text-slate-800 dark:text-slate-100 font-sans min-h-screen transition-colors duration-300 selection:bg-orange-500 selection:text-white">
+    class="bg-neutral-200/70 dark:bg-neutral-950 text-neutral-800 dark:text-neutral-100 font-sans min-h-screen transition-colors duration-300 selection:bg-brand selection:text-white">
 
     <!-- Mobile-First HP Container (Full screen on mobile, Phone frame on desktop) -->
     <div
-        class="w-full max-w-[430px] mx-auto min-h-screen sm:min-h-[calc(100vh-2.5rem)] sm:my-5 bg-gradient-to-b from-slate-50 via-white to-slate-100 dark:from-slate-900 dark:via-slate-900 dark:to-slate-950 sm:rounded-[2.25rem] sm:shadow-2xl sm:border sm:border-slate-200/80 dark:sm:border-slate-800 flex flex-col px-4 py-5 relative">
+        class="w-full max-w-[430px] mx-auto min-h-screen sm:min-h-[calc(100vh-2.5rem)] sm:my-5 bg-gradient-to-b from-neutral-50 via-white to-neutral-100 dark:from-neutral-900 dark:via-neutral-900 dark:to-neutral-950 sm:rounded-[2.25rem] sm:shadow-2xl sm:border sm:border-neutral-200/80 dark:sm:border-neutral-800 flex flex-col px-4 py-5 relative">
 
         <!-- Top Action Buttons (Public Ready: Only Share & Theme Toggle) -->
         <div class="flex items-center justify-between mb-2">
             <span
-                class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-orange-500/10 dark:bg-orange-500/15 text-orange-600 dark:text-orange-400 text-[11px] font-bold">
-                <span class="w-1.5 h-1.5 rounded-full bg-orange-500 animate-pulse"></span>
+                class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-brand/10 dark:bg-brand/15 text-brand text-[11px] font-bold">
+                <span class="w-1.5 h-1.5 rounded-full bg-brand animate-pulse"></span>
                 Katalog Resmi
             </span>
 
             <div class="flex items-center gap-2">
                 <!-- Share Profile Button -->
                 <button onclick="shareCurrentPage()"
-                    class="w-9 h-9 rounded-full bg-white dark:bg-slate-800 border border-slate-200/90 dark:border-slate-700 text-slate-600 dark:text-slate-300 shadow-sm active:scale-95 hover:scale-105 transition flex items-center justify-center"
+                    class="w-9 h-9 rounded-full bg-white dark:bg-neutral-800 border border-neutral-200/90 dark:border-neutral-700 text-neutral-600 dark:text-neutral-300 shadow-sm active:scale-95 hover:scale-105 transition flex items-center justify-center"
                     title="Bagikan Link Bio" aria-label="Bagikan">
                     <i class="fa-solid fa-share-nodes text-xs"></i>
                 </button>
 
                 <!-- Dark Mode Toggle -->
                 <button onclick="toggleTheme()"
-                    class="w-9 h-9 rounded-full bg-white dark:bg-slate-800 border border-slate-200/90 dark:border-slate-700 text-slate-600 dark:text-slate-300 shadow-sm active:scale-95 hover:scale-105 transition flex items-center justify-center"
+                    class="w-9 h-9 rounded-full bg-white dark:bg-neutral-800 border border-neutral-200/90 dark:border-neutral-700 text-neutral-600 dark:text-neutral-300 shadow-sm active:scale-95 hover:scale-105 transition flex items-center justify-center"
                     title="Ganti Tema" aria-label="Ganti Tema">
                     <i id="themeIcon" class="fa-solid fa-moon text-xs"></i>
                 </button>
@@ -82,15 +85,15 @@
         <header class="text-center mb-4">
             <div class="relative inline-block">
                 <img id="profileAvatar"
-                    src="https://placehold.co/200x200/ea580c/ffffff?text=RA"
-                    onerror="this.src='https://placehold.co/200x200/ea580c/ffffff?text=RA'" alt="Avatar"
-                    class="w-20 h-20 rounded-full object-cover mx-auto border-4 border-white dark:border-slate-800 shadow-md">
+                    src="https://placehold.co/200x200/FE2C55/ffffff?text=RA"
+                    onerror="this.src='https://placehold.co/200x200/FE2C55/ffffff?text=RA'" alt="Avatar"
+                    class="w-20 h-20 rounded-full object-cover mx-auto border-4 border-white dark:border-neutral-800 shadow-[-3px_-3px_0_#25F4EE,3px_3px_0_#FE2C55]">
             </div>
 
-            <h1 id="profileTitle" class="text-base font-extrabold text-slate-900 dark:text-white mt-2.5 tracking-tight">
+            <h1 id="profileTitle" class="text-base font-extrabold text-neutral-900 dark:text-white mt-2.5 tracking-tight">
                 Rumah Ansaka 🛵
             </h1>
-            <p id="profileBio" class="text-xs text-slate-500 dark:text-slate-400 mt-1 px-2 leading-relaxed">
+            <p id="profileBio" class="text-xs text-neutral-500 dark:text-neutral-400 mt-1 px-2 leading-relaxed">
                 Rumah 315 juta di gang Jakarta Selatan. Semua barang yang muncul di video ada di bawah, ketik nomor urut
                 (contoh: 001) atau nama barang 👇
             </p>
@@ -103,16 +106,16 @@
 
         <!-- Sticky Search & Category Filter (Optimized for Mobile Touch) -->
         <div
-            class="sticky top-0 z-30 bg-slate-50/95 dark:bg-slate-900/95 backdrop-blur-md py-2.5 mb-2 -mx-4 px-4 border-b border-slate-200/60 dark:border-slate-800/60">
+            class="sticky top-0 z-30 bg-neutral-50/95 dark:bg-neutral-900/95 backdrop-blur-md py-2.5 mb-2 -mx-4 px-4 border-b border-neutral-200/60 dark:border-neutral-800/60">
             <!-- Search Input (text-base on mobile prevents auto-zoom on iOS) -->
             <div class="relative">
                 <i
-                    class="fa-solid fa-magnifying-glass absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 text-sm"></i>
+                    class="fa-solid fa-magnifying-glass absolute left-3.5 top-1/2 -tranneutral-y-1/2 text-neutral-400 text-sm"></i>
                 <input type="search" id="searchInput" oninput="filterLinks()"
                     placeholder="Ketik nomor (cth: 001) atau nama barang..."
-                    class="w-full pl-10 pr-9 py-2.5 rounded-2xl bg-white dark:bg-slate-800/90 border border-slate-200/90 dark:border-slate-700 text-base sm:text-xs font-medium placeholder:text-xs focus:outline-none focus:ring-2 focus:ring-orange-500 shadow-sm transition">
+                    class="w-full pl-10 pr-9 py-2.5 rounded-2xl bg-white dark:bg-neutral-800/90 border border-neutral-200/90 dark:border-neutral-700 text-base sm:text-xs font-medium placeholder:text-xs focus:outline-none focus:ring-2 focus:ring-brand shadow-sm transition">
                 <button id="clearSearchBtn" onclick="clearSearch()"
-                    class="hidden absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 p-1">
+                    class="hidden absolute right-3 top-1/2 -tranneutral-y-1/2 text-neutral-400 hover:text-neutral-600 dark:hover:text-neutral-200 p-1">
                     <i class="fa-solid fa-circle-xmark text-base"></i>
                 </button>
             </div>
@@ -125,7 +128,7 @@
 
         <!-- Link Counter Info -->
         <div
-            class="flex items-center justify-between px-1 mb-2.5 text-[11px] text-slate-400 dark:text-slate-500 font-medium">
+            class="flex items-center justify-between px-1 mb-2.5 text-[11px] text-neutral-400 dark:text-neutral-500 font-medium">
             <span id="linkCountText">Memuat link...</span>
             <span>Klik untuk langsung buka</span>
         </div>
@@ -137,17 +140,17 @@
 
         <!-- Empty State -->
         <div id="emptyState"
-            class="hidden text-center py-10 px-4 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 my-2">
+            class="hidden text-center py-10 px-4 rounded-2xl bg-white dark:bg-neutral-900 border border-neutral-200/80 dark:border-neutral-800 my-2">
             <div
-                class="w-12 h-12 rounded-full bg-orange-50 dark:bg-orange-950/50 text-orange-500 flex items-center justify-center text-lg mx-auto mb-2.5">
+                class="w-12 h-12 rounded-full bg-brand/10 dark:bg-brand/20 text-brand flex items-center justify-center text-lg mx-auto mb-2.5">
                 <i class="fa-solid fa-link-slash"></i>
             </div>
-            <h3 class="text-sm font-bold text-slate-800 dark:text-white">Link Tidak Ditemukan</h3>
-            <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">
+            <h3 class="text-sm font-bold text-neutral-800 dark:text-white">Link Tidak Ditemukan</h3>
+            <p class="text-xs text-neutral-500 dark:text-neutral-400 mt-1">
                 Nomor atau kata kunci yang kamu cari belum ada.
             </p>
             <button onclick="resetFilters()"
-                class="mt-3 px-4 py-2 rounded-xl bg-orange-500 hover:bg-orange-600 text-white text-xs font-semibold transition">
+                class="mt-3 px-4 py-2 rounded-xl bg-brand hover:bg-brand/90 text-white text-xs font-semibold transition">
                 Tampilkan Semua Link
             </button>
         </div>
@@ -155,11 +158,11 @@
         <!-- Footer -->
         <footer class="mt-10 pt-4 text-center">
             <div
-                class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/70 dark:bg-slate-900/70 border border-slate-200/60 dark:border-slate-800 text-[11px] text-slate-500 dark:text-slate-400 shadow-sm">
-                <i class="fa-solid fa-bolt text-orange-500"></i>
+                class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/70 dark:bg-neutral-900/70 border border-neutral-200/60 dark:border-neutral-800 text-[11px] text-neutral-500 dark:text-neutral-400 shadow-sm">
+                <i class="fa-solid fa-bolt text-brand"></i>
                 <span>Powered by <strong id="footerBrand">rumah.ansaka</strong></span>
             </div>
-            <p class="mt-2.5 px-4 text-[10px] leading-relaxed text-slate-400 dark:text-slate-500">
+            <p class="mt-2.5 px-4 text-[10px] leading-relaxed text-neutral-400 dark:text-neutral-500">
                 Link di halaman ini adalah link affiliate. Harga tetap sama untukmu.
             </p>
         </footer>
@@ -167,9 +170,9 @@
 
     <!-- Toast Notification -->
     <div id="toastContainer"
-        class="fixed bottom-5 left-1/2 -translate-x-1/2 z-50 pointer-events-none transition-all duration-300 opacity-0 translate-y-4 w-max max-w-[90vw]">
+        class="fixed bottom-5 left-1/2 -tranneutral-x-1/2 z-50 pointer-events-none transition-all duration-300 opacity-0 tranneutral-y-4 w-max max-w-[90vw]">
         <div
-            class="bg-slate-900 dark:bg-white text-white dark:text-slate-900 px-4 py-2.5 rounded-full shadow-xl text-xs font-semibold flex items-center gap-2">
+            class="bg-neutral-900 dark:bg-white text-white dark:text-neutral-900 px-4 py-2.5 rounded-full shadow-xl text-xs font-semibold flex items-center gap-2">
             <i class="fa-solid fa-circle-check text-emerald-400 dark:text-emerald-600"></i>
             <span id="toastMessage">Link berhasil disalin!</span>
         </div>
@@ -186,7 +189,7 @@
             brandName: "rumah.ansaka",
             title: "Rumah Ansaka 🛵",
             bio: "Rumah 315 juta di gang Jakarta Selatan. Semua barang yang muncul di video ada di bawah, ketik nomor urut (contoh: 001) atau nama barang 👇",
-            avatarUrl: "https://placehold.co/200x200/ea580c/ffffff?text=RA",
+            avatarUrl: "https://placehold.co/200x200/FE2C55/ffffff?text=RA",
             socials: [
                 { icon: "fa-brands fa-tiktok", url: "https://www.tiktok.com/@rumah.ansaka", label: "TikTok" }
             ]
@@ -288,9 +291,9 @@
             },
             tiktok: {
                 name: "TikTok",
-                iconBg: "bg-slate-900/10 text-slate-900 dark:bg-white/15 dark:text-white",
-                numberBg: "bg-slate-900 dark:bg-white text-white dark:text-slate-900",
-                hoverBorder: "hover:border-slate-900 dark:hover:border-white",
+                iconBg: "bg-neutral-900/10 text-neutral-900 dark:bg-white/15 dark:text-white",
+                numberBg: "bg-neutral-900 dark:bg-white text-white dark:text-neutral-900",
+                hoverBorder: "hover:border-neutral-900 dark:hover:border-white",
                 icon: "fa-brands fa-tiktok"
             },
             tokopedia: {
@@ -326,7 +329,7 @@
             socialContainer.innerHTML = PROFILE_CONFIG.socials.map(soc => `
                 <a href="${soc.url}" target="_blank" rel="noopener noreferrer" 
                    aria-label="${soc.label}" title="${soc.label}"
-                   class="w-9 h-9 rounded-full bg-white dark:bg-slate-800 border border-slate-200/80 dark:border-slate-700 text-slate-700 dark:text-slate-200 flex items-center justify-center active:scale-95 hover:scale-110 hover:text-orange-500 dark:hover:text-orange-400 transition shadow-sm">
+                   class="w-9 h-9 rounded-full bg-white dark:bg-neutral-800 border border-neutral-200/80 dark:border-neutral-700 text-neutral-700 dark:text-neutral-200 flex items-center justify-center active:scale-95 hover:scale-110 hover:text-brand transition shadow-sm">
                     <i class="${soc.icon} text-sm"></i>
                 </a>
             `).join('');
@@ -339,8 +342,8 @@
             container.innerHTML = uniqueCategories.map(cat => {
                 const isActive = cat === activeCategory;
                 const activeClasses = isActive
-                    ? "bg-slate-900 dark:bg-white text-white dark:text-slate-900 border-slate-900 dark:border-white shadow-sm"
-                    : "bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 border-slate-200/90 dark:border-slate-700 hover:border-slate-400";
+                    ? "bg-neutral-900 dark:bg-white text-white dark:text-neutral-900 border-neutral-900 dark:border-white shadow-sm"
+                    : "bg-white dark:bg-neutral-800 text-neutral-600 dark:text-neutral-300 border-neutral-200/90 dark:border-neutral-700 hover:border-neutral-400";
 
                 return `
                     <button onclick="selectCategory('${cat}')" 
@@ -398,7 +401,7 @@
                 const plat = PLATFORM_CONFIG[item.platform] || PLATFORM_CONFIG.shopee;
 
                 return `
-                <div class="group relative flex items-center bg-white dark:bg-slate-800/90 rounded-2xl border border-slate-200/90 dark:border-slate-700/80 shadow-sm hover:shadow-md ${plat.hoverBorder} transition-all duration-150 active:scale-[0.99]">
+                <div class="group relative flex items-center bg-white dark:bg-neutral-800/90 rounded-2xl border border-neutral-200/90 dark:border-neutral-700/80 shadow-sm hover:shadow-md ${plat.hoverBorder} transition-all duration-150 active:scale-[0.99]">
                     <!-- Main Clickable Link Area -->
                     <a href="${item.url}" target="_blank" rel="noopener noreferrer" 
                        class="flex-1 flex items-center gap-3 p-3 min-w-0">
@@ -420,7 +423,7 @@
                                 </span>
                                 ` : ''}
                             </div>
-                            <h2 class="text-xs sm:text-[13px] font-bold text-slate-800 dark:text-slate-100 leading-snug line-clamp-2 group-hover:text-orange-600 dark:group-hover:text-orange-400 transition-colors">
+                            <h2 class="text-xs sm:text-[13px] font-bold text-neutral-800 dark:text-neutral-100 leading-snug line-clamp-2 group-hover:text-brand transition-colors">
                                 ${item.title}
                             </h2>
                         </div>
@@ -430,11 +433,11 @@
                     <div class="flex items-center pr-2 gap-0.5 shrink-0">
                         <button onclick="copyTextToClipboard('${item.url}', 'Link #${item.number} berhasil disalin!')" 
                                 title="Salin Link" aria-label="Salin Link"
-                                class="w-8 h-8 rounded-xl text-slate-400 hover:text-slate-700 dark:hover:text-white active:bg-slate-100 dark:active:bg-slate-700 flex items-center justify-center transition">
+                                class="w-8 h-8 rounded-xl text-neutral-400 hover:text-neutral-700 dark:hover:text-white active:bg-neutral-100 dark:active:bg-neutral-700 flex items-center justify-center transition">
                             <i class="fa-regular fa-copy text-xs"></i>
                         </button>
                         <a href="${item.url}" target="_blank" rel="noopener noreferrer" aria-label="Buka Link"
-                           class="w-6 h-8 flex items-center justify-center text-slate-400 group-hover:text-slate-700 dark:group-hover:text-white transition-all">
+                           class="w-6 h-8 flex items-center justify-center text-neutral-400 group-hover:text-neutral-700 dark:group-hover:text-white transition-all">
                             <i class="fa-solid fa-chevron-right text-xs"></i>
                         </a>
                     </div>
@@ -478,13 +481,13 @@
             const toast = document.getElementById('toastContainer');
             document.getElementById('toastMessage').textContent = message;
 
-            toast.classList.remove('opacity-0', 'translate-y-4');
-            toast.classList.add('opacity-100', 'translate-y-0');
+            toast.classList.remove('opacity-0', 'tranneutral-y-4');
+            toast.classList.add('opacity-100', 'tranneutral-y-0');
 
             clearTimeout(toastTimeout);
             toastTimeout = setTimeout(() => {
-                toast.classList.add('opacity-0', 'translate-y-4');
-                toast.classList.remove('opacity-100', 'translate-y-0');
+                toast.classList.add('opacity-0', 'tranneutral-y-4');
+                toast.classList.remove('opacity-100', 'tranneutral-y-0');
             }, 2500);
         }
 
