@@ -110,12 +110,12 @@
             <!-- Search Input (text-base on mobile prevents auto-zoom on iOS) -->
             <div class="relative">
                 <i
-                    class="fa-solid fa-magnifying-glass absolute left-3.5 top-1/2 -tranneutral-y-1/2 text-neutral-400 text-sm"></i>
+                    class="fa-solid fa-magnifying-glass absolute left-3.5 top-1/2 -translate-y-1/2 text-neutral-400 text-sm"></i>
                 <input type="search" id="searchInput" oninput="filterLinks()"
                     placeholder="Ketik nomor (cth: 001) atau nama barang..."
                     class="w-full pl-10 pr-9 py-2.5 rounded-2xl bg-white dark:bg-neutral-800/90 border border-neutral-200/90 dark:border-neutral-700 text-base sm:text-xs font-medium placeholder:text-xs focus:outline-none focus:ring-2 focus:ring-brand shadow-sm transition">
                 <button id="clearSearchBtn" onclick="clearSearch()"
-                    class="hidden absolute right-3 top-1/2 -tranneutral-y-1/2 text-neutral-400 hover:text-neutral-600 dark:hover:text-neutral-200 p-1">
+                    class="hidden absolute right-3 top-1/2 -translate-y-1/2 text-neutral-400 hover:text-neutral-600 dark:hover:text-neutral-200 p-1">
                     <i class="fa-solid fa-circle-xmark text-base"></i>
                 </button>
             </div>
@@ -170,7 +170,7 @@
 
     <!-- Toast Notification -->
     <div id="toastContainer"
-        class="fixed bottom-5 left-1/2 -tranneutral-x-1/2 z-50 pointer-events-none transition-all duration-300 opacity-0 tranneutral-y-4 w-max max-w-[90vw]">
+        class="fixed bottom-5 left-1/2 -translate-x-1/2 z-50 pointer-events-none transition-all duration-300 opacity-0 translate-y-4 w-max max-w-[90vw]">
         <div
             class="bg-neutral-900 dark:bg-white text-white dark:text-neutral-900 px-4 py-2.5 rounded-full shadow-xl text-xs font-semibold flex items-center gap-2">
             <i class="fa-solid fa-circle-check text-emerald-400 dark:text-emerald-600"></i>
@@ -180,9 +180,9 @@
 
     <script>
         /* ============================================================================
-         * PANDUAN EDIT UNTUK PEMILIK WEBSITE (GITHUB PAGES):
+         * PANDUAN EDIT UNTUK PEMILIK WEBSITE:
          * 1. Ubah nama, bio, dan sosmed di bagian PROFILE_CONFIG.
-         * 2. Tambah/ubah daftar link affiliate Anda langsung di bagian LINKS_DATA.
+         * 2. Tambah/ubah link affiliate lewat halaman /admin/ (data tersimpan di links.json).
          * ============================================================================ */
 
         const PROFILE_CONFIG = {
@@ -195,91 +195,13 @@
             ]
         };
 
-        /* DAFTAR LINK AFFILIATE (MODEL HOLINK - HANYA LINK TANPA FOTO/HARGA) */
-        let LINKS_DATA = [
-            {
-                number: "010",
-                title: "Cat Pelapis Anti Bocor Waterproofing Dak & Dinding 4kg",
-                category: "Cat",
-                platform: "shopee",
-                badge: "Viral FYP",
-                url: "https://shopee.co.id/"
-            },
-            {
-                number: "009",
-                title: "Bor Listrik Cordless 2 Baterai + Set Mata Bor Lengkap",
-                category: "Perkakas",
-                platform: "tiktok",
-                badge: "Best Seller",
-                url: "https://www.tiktok.com/"
-            },
-            {
-                number: "008",
-                title: "Lampu Panel LED Plafon Bulat 18W Cahaya Putih",
-                category: "Listrik",
-                platform: "shopee",
-                badge: "Promo",
-                url: "https://shopee.co.id/"
-            },
-            {
-                number: "007",
-                title: "Shower Set Stainless Anti Karat + Selang & Holder",
-                category: "Kamar Mandi",
-                platform: "tokopedia",
-                badge: "",
-                url: "https://www.tokopedia.com/"
-            },
-            {
-                number: "006",
-                title: "Rak Piring Stainless 2 Susun Anti Karat",
-                category: "Dapur",
-                platform: "shopee",
-                badge: "Diskon 50%",
-                url: "https://shopee.co.id/"
-            },
-            {
-                number: "005",
-                title: "Semen Instan Perekat Keramik & Bata Ringan 25kg",
-                category: "Bangunan",
-                platform: "tokopedia",
-                badge: "",
-                url: "https://www.tokopedia.com/"
-            },
-            {
-                number: "004",
-                title: "Meteran Laser Digital 40m untuk Ukur Ruangan",
-                category: "Perkakas",
-                platform: "lazada",
-                badge: "Termurah",
-                url: "https://www.lazada.co.id/"
-            },
-            {
-                number: "003",
-                title: "Lemari Pakaian Plastik 4 Susun Bisa Dirakit Sendiri",
-                category: "Perabot",
-                platform: "shopee",
-                badge: "10RB+ Terjual",
-                url: "https://shopee.co.id/"
-            },
-            {
-                number: "002",
-                title: "Lem Sealant Silikon Anti Bocor untuk Kamar Mandi & Kaca",
-                category: "Bangunan",
-                platform: "shopee",
-                badge: "",
-                url: "https://shopee.co.id/"
-            },
-            {
-                number: "001",
-                title: "Kabel Roll Stop Kontak 4 Lubang + USB 5 Meter",
-                category: "Listrik",
-                platform: "tiktok",
-                badge: "",
-                url: "https://www.tiktok.com/"
-            }
-        ];
+        // Diisi dari links.json saat halaman dibuka. Kelola lewat /admin/.
+        let LINKS_DATA = [];
 
         let activeCategory = "Semua";
+
+        // Data comes from links.json (editable via /admin/), so escape it before putting it into HTML.
+        const esc = value => String(value).replace(/[&<>"']/g, ch => `&#${ch.charCodeAt(0)};`);
 
         const PLATFORM_CONFIG = {
             shopee: {
@@ -346,9 +268,9 @@
                     : "bg-white dark:bg-neutral-800 text-neutral-600 dark:text-neutral-300 border-neutral-200/90 dark:border-neutral-700 hover:border-neutral-400";
 
                 return `
-                    <button onclick="selectCategory('${cat}')" 
+                    <button data-category="${esc(cat)}" onclick="selectCategory(this.dataset.category)"
                             class="px-3.5 py-1.5 rounded-full text-xs font-semibold whitespace-nowrap border active:scale-95 transition ${activeClasses}">
-                        ${cat}
+                        ${esc(cat)}
                     </button>
                 `;
             }).join('');
@@ -403,12 +325,12 @@
                 return `
                 <div class="group relative flex items-center bg-white dark:bg-neutral-800/90 rounded-2xl border border-neutral-200/90 dark:border-neutral-700/80 shadow-sm hover:shadow-md ${plat.hoverBorder} transition-all duration-150 active:scale-[0.99]">
                     <!-- Main Clickable Link Area -->
-                    <a href="${item.url}" target="_blank" rel="noopener noreferrer" 
+                    <a href="${esc(item.url)}" target="_blank" rel="noopener noreferrer" 
                        class="flex-1 flex items-center gap-3 p-3 min-w-0">
                         
                         <!-- Number Badge (#001) -->
                         <div class="shrink-0 px-2.5 py-2.5 rounded-xl font-extrabold text-xs tracking-tight shadow-sm flex items-center justify-center min-w-[48px] ${plat.numberBg}">
-                            #${item.number}
+                            #${esc(item.number)}
                         </div>
 
                         <!-- Link Text & Metadata -->
@@ -419,24 +341,25 @@
                                 </span>
                                 ${item.badge ? `
                                 <span class="text-[10px] font-bold px-1.5 py-0.5 rounded-md bg-rose-500/10 text-rose-600 dark:bg-rose-500/20 dark:text-rose-300">
-                                    ${item.badge}
+                                    ${esc(item.badge)}
                                 </span>
                                 ` : ''}
                             </div>
                             <h2 class="text-xs sm:text-[13px] font-bold text-neutral-800 dark:text-neutral-100 leading-snug line-clamp-2 group-hover:text-brand transition-colors">
-                                ${item.title}
+                                ${esc(item.title)}
                             </h2>
                         </div>
                     </a>
 
                     <!-- Right Actions: Copy Link & Arrow -->
                     <div class="flex items-center pr-2 gap-0.5 shrink-0">
-                        <button onclick="copyTextToClipboard('${item.url}', 'Link #${item.number} berhasil disalin!')" 
+                        <button data-url="${esc(item.url)}" data-message="Link #${esc(item.number)} berhasil disalin!"
+                                onclick="copyTextToClipboard(this.dataset.url, this.dataset.message)"
                                 title="Salin Link" aria-label="Salin Link"
                                 class="w-8 h-8 rounded-xl text-neutral-400 hover:text-neutral-700 dark:hover:text-white active:bg-neutral-100 dark:active:bg-neutral-700 flex items-center justify-center transition">
                             <i class="fa-regular fa-copy text-xs"></i>
                         </button>
-                        <a href="${item.url}" target="_blank" rel="noopener noreferrer" aria-label="Buka Link"
+                        <a href="${esc(item.url)}" target="_blank" rel="noopener noreferrer" aria-label="Buka Link"
                            class="w-6 h-8 flex items-center justify-center text-neutral-400 group-hover:text-neutral-700 dark:group-hover:text-white transition-all">
                             <i class="fa-solid fa-chevron-right text-xs"></i>
                         </a>
@@ -481,13 +404,13 @@
             const toast = document.getElementById('toastContainer');
             document.getElementById('toastMessage').textContent = message;
 
-            toast.classList.remove('opacity-0', 'tranneutral-y-4');
-            toast.classList.add('opacity-100', 'tranneutral-y-0');
+            toast.classList.remove('opacity-0', 'translate-y-4');
+            toast.classList.add('opacity-100', 'translate-y-0');
 
             clearTimeout(toastTimeout);
             toastTimeout = setTimeout(() => {
-                toast.classList.add('opacity-0', 'tranneutral-y-4');
-                toast.classList.remove('opacity-100', 'tranneutral-y-0');
+                toast.classList.add('opacity-0', 'translate-y-4');
+                toast.classList.remove('opacity-100', 'translate-y-0');
             }, 2500);
         }
 
@@ -506,7 +429,7 @@
             }
         }
 
-        window.onload = function () {
+        window.onload = async function () {
             if (localStorage.getItem('theme') === 'dark' ||
                 (!localStorage.getItem('theme') && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
                 document.documentElement.classList.add('dark');
@@ -514,6 +437,12 @@
             }
 
             initProfile();
+            try {
+                LINKS_DATA = await fetch('links.json', { cache: 'no-cache' }).then(res => res.json());
+            } catch (err) {
+                document.getElementById('linkCountText').textContent = 'Gagal memuat link, coba muat ulang halaman.';
+                return;
+            }
             renderCategories();
             filterLinks();
         };
