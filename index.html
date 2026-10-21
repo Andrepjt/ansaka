@@ -142,6 +142,10 @@
             <!-- Link buttons injected via JS -->
         </main>
 
+        <button id="showMoreBtn" onclick="showMoreLinks()"
+            class="hidden w-full mt-2.5 py-3 rounded-2xl bg-white dark:bg-neutral-800/90 border border-neutral-200/90 dark:border-neutral-700/80 text-xs font-bold text-neutral-700 dark:text-neutral-200 shadow-sm hover:border-brand active:scale-[0.99] transition">
+        </button>
+
         <!-- Empty State -->
         <div id="emptyState"
             class="hidden text-center py-10 px-4 rounded-2xl bg-white dark:bg-neutral-900 border border-neutral-200/80 dark:border-neutral-800 my-2">
@@ -286,7 +290,21 @@
             filterLinks();
         }
 
+        // Render in pages so a long list stays short; search and categories always cover every link.
+        const PAGE_SIZE = 30;
+        let visibleCount = PAGE_SIZE;
+
         function filterLinks() {
+            visibleCount = PAGE_SIZE;
+            renderFiltered();
+        }
+
+        function showMoreLinks() {
+            visibleCount += PAGE_SIZE;
+            renderFiltered();
+        }
+
+        function renderFiltered() {
             const query = document.getElementById('searchInput').value.trim().toLowerCase();
             const clearBtn = document.getElementById('clearSearchBtn');
 
@@ -313,7 +331,15 @@
             const emptyState = document.getElementById('emptyState');
             const countText = document.getElementById('linkCountText');
 
-            countText.textContent = `Menampilkan ${links.length} link produk`;
+            const shown = Math.min(links.length, visibleCount);
+            countText.textContent = shown < links.length
+                ? `Menampilkan ${shown} dari ${links.length} link produk`
+                : `Menampilkan ${links.length} link produk`;
+
+            const remaining = links.length - shown;
+            const moreBtn = document.getElementById('showMoreBtn');
+            moreBtn.classList.toggle('hidden', remaining === 0);
+            moreBtn.textContent = `Tampilkan ${Math.min(PAGE_SIZE, remaining)} link lagi`;
 
             if (links.length === 0) {
                 listContainer.innerHTML = "";
@@ -323,7 +349,7 @@
 
             emptyState.classList.add('hidden');
 
-            listContainer.innerHTML = links.map(item => {
+            listContainer.innerHTML = links.slice(0, visibleCount).map(item => {
                 const plat = PLATFORM_CONFIG[item.platform] || PLATFORM_CONFIG.shopee;
 
                 return `
