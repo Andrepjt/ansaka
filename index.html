@@ -1,182 +1,518 @@
 <!DOCTYPE html>
-<html lang="id" class="scroll-smooth">
+<html lang="id">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Rumah Ansaka | Link Barang di Video</title>
-    <meta name="description" content="Kumpulan link pembelian barang viral dan rekomendasi terbaik.">
+    <meta name="description" content="Daftar barang yang muncul di video renovasi Rumah Ansaka, lengkap dengan link belinya.">
 
-    <!-- Tailwind CSS CDN -->
-    <script src="https://cdn.tailwindcss.com"></script>
-
-    <!-- Font Awesome Icons -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-
-    <!-- Google Fonts: Inter -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Archivo+Narrow:wght@400;500;700&family=Kalam:wght@400;700&display=swap" rel="stylesheet">
 
     <script>
-        tailwind.config = {
-            darkMode: 'class',
-            theme: {
-                extend: {
-                    fontFamily: {
-                        sans: ['Inter', 'sans-serif'],
-                    },
-                    colors: {
-                        brand: { DEFAULT: '#FE2C55', cyan: '#25F4EE' }
-                    }
-                }
+        // Set the theme before first paint so the page doesn't flash.
+        try {
+            const saved = localStorage.getItem('theme');
+            if (saved === 'dark' || (!saved && matchMedia('(prefers-color-scheme: dark)').matches)) {
+                document.documentElement.classList.add('dark');
             }
-        }
+        } catch (e) { }
     </script>
 
     <style>
-        .no-scrollbar::-webkit-scrollbar {
-            display: none;
+        /* The page is a hardware-store receipt (nota): yellow carbon-copy paper, red printed form, blue ballpoint entries. */
+        :root {
+            --paper: #FFF2B3;
+            --rule: #C0262D;
+            --rule-soft: rgba(192, 38, 45, .35);
+            --print: #7A1C1C;
+            --print-faded: rgba(122, 28, 28, .6);
+            --ink: #1F3FA8;
+            --ink-faded: rgba(31, 63, 168, .5);
+            --press: rgba(31, 63, 168, .08);
+            --stamp: #5B3FA0;
+            --table: #A7A49C;
         }
 
-        .no-scrollbar {
-            -ms-overflow-style: none;
+        /* Dark mode: carbon paper. */
+        html.dark {
+            --paper: #171B33;
+            --rule: #E0646B;
+            --rule-soft: rgba(224, 100, 107, .35);
+            --print: #F2B8B8;
+            --print-faded: rgba(242, 184, 184, .6);
+            --ink: #A9BEFF;
+            --ink-faded: rgba(169, 190, 255, .5);
+            --press: rgba(169, 190, 255, .1);
+            --stamp: #BBA5F2;
+            --table: #0B0D18;
+        }
+
+        * {
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            margin: 0;
+            background: var(--table);
+            color: var(--print);
+            font: 15px/1.45 'Archivo Narrow', 'Arial Narrow', sans-serif;
+        }
+
+        button {
+            font: inherit;
+            color: inherit;
+            background: none;
+            border: 0;
+            padding: 0;
+            cursor: pointer;
+        }
+
+        :focus-visible {
+            outline: 2px solid var(--ink);
+            outline-offset: 2px;
+        }
+
+        .sheet {
+            max-width: 430px;
+            min-height: 100vh;
+            margin: 0 auto;
+            padding: 20px 16px 32px;
+            background: var(--paper);
+        }
+
+        @media (min-width: 480px) {
+            .sheet {
+                min-height: 0;
+                margin: 24px auto;
+                box-shadow: 0 1px 2px rgba(0, 0, 0, .25), 0 14px 32px rgba(0, 0, 0, .28);
+            }
+        }
+
+        /* Store header */
+        .store {
+            display: grid;
+            grid-template-columns: 72px 1fr;
+            gap: 14px;
+            align-items: center;
+            padding-bottom: 14px;
+            border-bottom: 3px double var(--rule);
+        }
+
+        .store img {
+            width: 72px;
+            height: 72px;
+            object-fit: cover;
+            padding: 3px;
+            border: 1px solid var(--rule);
+        }
+
+        .store h1 {
+            margin: 0;
+            color: var(--rule);
+            font-size: 32px;
+            font-weight: 700;
+            line-height: 1;
+            letter-spacing: -.01em;
+        }
+
+        .store p {
+            margin: 5px 0 0;
+            font-size: 14px;
+            line-height: 1.35;
+        }
+
+        .store a {
+            color: var(--print);
+            font-weight: 700;
+            text-underline-offset: 3px;
+        }
+
+        .nota-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            gap: 12px;
+            margin-top: 12px;
+        }
+
+        .nota-bar h2 {
+            margin: 0;
+            color: var(--rule);
+            font-size: 17px;
+            font-weight: 700;
+        }
+
+        .nota-bar button {
+            font-size: 13px;
+            text-decoration: underline;
+            text-underline-offset: 3px;
+            padding: 4px 0 4px 10px;
+        }
+
+        /* Search + categories + column heads stay on screen while scrolling */
+        .finder {
+            position: sticky;
+            top: 0;
+            z-index: 2;
+            background: var(--paper);
+            padding-top: 12px;
+        }
+
+        .no-field {
+            display: flex;
+            align-items: baseline;
+            gap: 8px;
+        }
+
+        .no-field label {
+            color: var(--rule);
+            font-size: 19px;
+            font-weight: 700;
+        }
+
+        .no-field input {
+            flex: 1;
+            min-width: 0;
+            padding: 0 0 2px;
+            border: 0;
+            border-bottom: 1.5px dotted var(--rule);
+            border-radius: 0;
+            background: transparent;
+            color: var(--ink);
+            font: 700 22px/1.3 'Kalam', cursive;
+            outline: none;
+            -webkit-appearance: none;
+            appearance: none;
+        }
+
+        .no-field input:focus-visible {
+            border-bottom-style: solid;
+            border-bottom-color: var(--ink);
+        }
+
+        .no-field input::placeholder {
+            color: var(--print-faded);
+            font: 15px 'Archivo Narrow', sans-serif;
+            opacity: 1;
+        }
+
+        .no-field input::-webkit-search-cancel-button {
+            -webkit-appearance: none;
+        }
+
+        .no-field button {
+            font-size: 13px;
+            text-decoration: underline;
+            text-underline-offset: 3px;
+        }
+
+        .ticks {
+            display: flex;
+            gap: 16px;
+            overflow-x: auto;
+            padding: 12px 2px 10px;
             scrollbar-width: none;
         }
 
-        /* Tap highlight removal for native mobile app feel */
-        * {
-            -webkit-tap-highlight-color: transparent;
+        .ticks::-webkit-scrollbar {
+            display: none;
+        }
+
+        .tick {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            white-space: nowrap;
+            font-size: 14px;
+        }
+
+        .tick::before {
+            content: '';
+            display: inline-grid;
+            place-items: center;
+            width: 13px;
+            height: 13px;
+            border: 1.5px solid var(--rule);
+            color: var(--ink);
+            font: 700 22px/0 'Kalam', cursive;
+        }
+
+        /* A hand-drawn tick, bigger than its box like a real one */
+        .tick[aria-pressed="true"]::before {
+            content: '✓';
+        }
+
+        .tick[aria-pressed="true"] {
+            color: var(--ink);
+        }
+
+        /* Receipt table */
+        .cols,
+        .row a,
+        .total {
+            display: grid;
+            grid-template-columns: 3.4rem 1fr 5.2rem;
+        }
+
+        .cols,
+        .row,
+        .empty,
+        .total {
+            border-left: 1px solid var(--rule);
+            border-right: 1px solid var(--rule);
+        }
+
+        .cols {
+            color: var(--rule);
+            font-size: 13px;
+            font-weight: 700;
+            border-top: 1px solid var(--rule);
+            border-bottom: 1px solid var(--rule);
+        }
+
+        .cols span {
+            padding: 5px 8px;
+        }
+
+        .cols span:not(:last-child),
+        .row .no,
+        .row .item {
+            border-right: 1px solid var(--rule);
+        }
+
+        .list {
+            margin: 0;
+            padding: 0;
+            list-style: none;
+        }
+
+        .row {
+            position: relative;
+            border-bottom: 1px solid var(--rule-soft);
+        }
+
+        .row a {
+            min-height: 4rem;
+            color: var(--ink);
+            text-decoration: none;
+            font: 17px/1.25 'Kalam', cursive;
+        }
+
+        .row a:active {
+            background: var(--press);
+        }
+
+        .row a:focus-visible {
+            outline-offset: -2px;
+        }
+
+        .row a > span {
+            padding: 9px 8px 8px;
+        }
+
+        .row .no {
+            font-weight: 700;
+            text-align: center;
+        }
+
+        .row .shop {
+            font-size: 15px;
+        }
+
+        .row .item em {
+            color: var(--rule);
+            font-style: normal;
+            font-size: 15px;
+            white-space: nowrap;
+        }
+
+        @media (hover: hover) {
+            .row a:hover .item {
+                text-decoration: underline;
+                text-decoration-color: var(--ink-faded);
+                text-underline-offset: 4px;
+            }
+        }
+
+        .row .copy {
+            position: absolute;
+            right: 0;
+            bottom: 6px;
+            width: 5.2rem;
+            font-size: 12px;
+            text-decoration: underline;
+            text-underline-offset: 2px;
+        }
+
+        .empty {
+            padding: 18px 8px 16px;
+            border-bottom: 1px solid var(--rule-soft);
+            color: var(--ink);
+            font: 17px/1.35 'Kalam', cursive;
+        }
+
+        .empty p {
+            margin: 0 0 10px;
+        }
+
+        .empty button {
+            color: var(--print);
+            font: 700 14px 'Archivo Narrow', sans-serif;
+            text-decoration: underline;
+            text-underline-offset: 3px;
+        }
+
+        .total {
+            border-top: 3px double var(--rule);
+            border-bottom: 1px solid var(--rule);
+            color: var(--rule);
+            font-weight: 700;
+        }
+
+        .total span {
+            padding: 6px 8px;
+        }
+
+        .total span:first-child {
+            grid-column: 1 / 3;
+            text-align: right;
+            border-right: 1px solid var(--rule);
+        }
+
+        .total span:last-child {
+            color: var(--ink);
+            font: 700 17px 'Kalam', cursive;
+        }
+
+        /* Sign-off with the store stamp */
+        .sign {
+            margin-top: 28px;
+            display: flex;
+            justify-content: flex-end;
+        }
+
+        .sign-off {
+            display: grid;
+            justify-items: center;
+            gap: 6px;
+            font-size: 14px;
+        }
+
+        .stamp {
+            display: grid;
+            justify-items: center;
+            padding: 6px 14px 5px;
+            border: 2px solid var(--stamp);
+            border-radius: 3px;
+            outline: 1px solid var(--stamp);
+            outline-offset: 2px;
+            color: var(--stamp);
+            font-size: 21px;
+            font-weight: 700;
+            line-height: 1.05;
+            transform: rotate(-6deg);
+            opacity: .85;
+        }
+
+        html:not(.dark) .stamp {
+            mix-blend-mode: multiply;
+        }
+
+        .stamp small {
+            font-size: 11px;
+            font-weight: 500;
+        }
+
+        .fine {
+            margin: 26px 0 0;
+            font-size: 12px;
+        }
+
+        .toast {
+            position: fixed;
+            left: 50%;
+            bottom: 20px;
+            z-index: 10;
+            max-width: calc(100vw - 32px);
+            padding: 8px 14px;
+            background: var(--ink);
+            color: var(--paper);
+            font-size: 14px;
+            font-weight: 700;
+            opacity: 0;
+            transform: translate(-50%, 12px);
+            transition: opacity .2s, transform .2s;
+            pointer-events: none;
+        }
+
+        .toast.show {
+            opacity: 1;
+            transform: translate(-50%, 0);
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            .toast {
+                transition: none;
+            }
         }
     </style>
 </head>
 
-<body
-    class="bg-neutral-200/70 dark:bg-neutral-950 text-neutral-800 dark:text-neutral-100 font-sans min-h-screen transition-colors duration-300 selection:bg-brand selection:text-white">
-
-    <!-- Mobile-First HP Container (Full screen on mobile, Phone frame on desktop) -->
-    <div
-        class="w-full max-w-[430px] mx-auto min-h-screen sm:min-h-[calc(100vh-2.5rem)] sm:my-5 bg-gradient-to-b from-neutral-50 via-white to-neutral-100 dark:from-neutral-900 dark:via-neutral-900 dark:to-neutral-950 sm:rounded-[2.25rem] sm:shadow-2xl sm:border sm:border-neutral-200/80 dark:sm:border-neutral-800 flex flex-col px-4 py-5 relative">
-
-        <!-- Top Action Buttons (Public Ready: Only Share & Theme Toggle) -->
-        <div class="flex items-center justify-between mb-2">
-            <span
-                class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-brand/10 dark:bg-brand/15 text-brand text-[11px] font-bold">
-                <span class="w-1.5 h-1.5 rounded-full bg-brand animate-pulse"></span>
-                Katalog
-            </span>
-
-            <div class="flex items-center gap-2">
-                <!-- Share Profile Button -->
-                <button onclick="shareCurrentPage()"
-                    class="w-9 h-9 rounded-full bg-white dark:bg-neutral-800 border border-neutral-200/90 dark:border-neutral-700 text-neutral-600 dark:text-neutral-300 shadow-sm active:scale-95 hover:scale-105 transition flex items-center justify-center"
-                    title="Bagikan Link Bio" aria-label="Bagikan">
-                    <i class="fa-solid fa-share-nodes text-xs"></i>
-                </button>
-
-                <!-- Dark Mode Toggle -->
-                <button onclick="toggleTheme()"
-                    class="w-9 h-9 rounded-full bg-white dark:bg-neutral-800 border border-neutral-200/90 dark:border-neutral-700 text-neutral-600 dark:text-neutral-300 shadow-sm active:scale-95 hover:scale-105 transition flex items-center justify-center"
-                    title="Ganti Tema" aria-label="Ganti Tema">
-                    <i id="themeIcon" class="fa-solid fa-moon text-xs"></i>
-                </button>
-            </div>
-        </div>
-
-        <!-- Profile Header -->
-        <header class="text-center mb-4">
-            <div class="relative inline-block">
-                <img id="profileAvatar" src="avatar.jpg"
-                    onerror="this.src='https://placehold.co/200x200/FE2C55/ffffff?text=RA'" alt="Avatar"
-                    class="w-20 h-20 rounded-full object-cover mx-auto border-4 border-white dark:border-neutral-800 shadow-[-3px_-3px_0_#25F4EE,3px_3px_0_#FE2C55]">
-            </div>
-
-            <h1 id="profileTitle"
-                class="text-base font-extrabold text-neutral-900 dark:text-white mt-2.5 tracking-tight">
-                Rumah Ansaka 🛵
-            </h1>
-            <p id="profileBio" class="text-xs text-neutral-500 dark:text-neutral-400 mt-1 px-2 leading-relaxed">
-                Rumah 315 juta di gang Jakarta Selatan. Semua barang yang muncul di video ada di bawah, ketik nomor urut
-                (contoh: 001) atau nama barang 👇
-            </p>
-
-            <!-- Social Icons Row -->
-            <div id="socialLinksContainer" class="flex items-center justify-center gap-2.5 mt-3">
-                <!-- Populated by JS -->
+<body>
+    <div class="sheet">
+        <header class="store">
+            <img id="profileAvatar" src="avatar.jpg" alt="Depan Rumah Ansaka">
+            <div>
+                <h1 id="profileTitle">Rumah Ansaka</h1>
+                <p id="profileBio">Rumah 315 juta di gang Jakarta Selatan. Bangun rumah dari awal, cerita anak rantau.</p>
+                <p id="socialLinksContainer"></p>
             </div>
         </header>
 
-        <!-- Sticky Search & Category Filter (Optimized for Mobile Touch) -->
-        <div
-            class="sticky top-0 z-30 bg-neutral-50/95 dark:bg-neutral-900/95 backdrop-blur-md py-2.5 mb-2 -mx-4 px-4 border-b border-neutral-200/60 dark:border-neutral-800/60">
-            <!-- Search Input (text-base on mobile prevents auto-zoom on iOS) -->
-            <div class="relative">
-                <i
-                    class="fa-solid fa-magnifying-glass absolute left-3.5 top-1/2 -translate-y-1/2 text-neutral-400 text-sm"></i>
-                <input type="search" id="searchInput" oninput="filterLinks()"
-                    placeholder="Ketik nomor (cth: 001) atau nama barang..."
-                    class="w-full pl-10 pr-9 py-2.5 rounded-2xl bg-white dark:bg-neutral-800/90 border border-neutral-200/90 dark:border-neutral-700 text-base sm:text-xs font-medium placeholder:text-xs focus:outline-none focus:ring-2 focus:ring-brand shadow-sm transition">
-                <button id="clearSearchBtn" onclick="clearSearch()"
-                    class="hidden absolute right-3 top-1/2 -translate-y-1/2 text-neutral-400 hover:text-neutral-600 dark:hover:text-neutral-200 p-1">
-                    <i class="fa-solid fa-circle-xmark text-base"></i>
-                </button>
-            </div>
-
-            <!-- Category Pills -->
-            <div id="categoryContainer" class="flex items-center gap-1.5 overflow-x-auto no-scrollbar mt-2.5 pb-0.5">
-                <!-- Populated by JS -->
+        <div class="nota-bar">
+            <h2>Nota belanja renovasi</h2>
+            <div>
+                <button type="button" onclick="shareCurrentPage()">Bagikan</button>
+                <button type="button" id="themeBtn" onclick="toggleTheme()">Mode gelap</button>
             </div>
         </div>
 
-        <!-- Link Counter Info -->
-        <div
-            class="flex items-center justify-between px-1 mb-2.5 text-[11px] text-neutral-400 dark:text-neutral-500 font-medium">
-            <span id="linkCountText">Memuat link...</span>
-            <span>Klik untuk langsung buka</span>
+        <div class="finder">
+            <div class="no-field">
+                <label for="searchInput">No.</label>
+                <input type="search" id="searchInput" oninput="filterLinks()" autocomplete="off" enterkeyhint="search"
+                    placeholder="nomor dari video, atau nama barang">
+                <button type="button" id="clearSearchBtn" onclick="clearSearch()" hidden>hapus</button>
+            </div>
+            <div id="categoryContainer" class="ticks" role="group" aria-label="Kategori"></div>
+            <div class="cols" aria-hidden="true"><span>No.</span><span>Nama barang</span><span>Toko</span></div>
         </div>
 
-        <!-- Vertical Link List (HoLink Style) -->
-        <main id="linksListContainer" class="space-y-2.5 flex-1">
-            <!-- Link buttons injected via JS -->
-        </main>
+        <ul id="linksListContainer" class="list"></ul>
 
-        <!-- Empty State -->
-        <div id="emptyState"
-            class="hidden text-center py-10 px-4 rounded-2xl bg-white dark:bg-neutral-900 border border-neutral-200/80 dark:border-neutral-800 my-2">
-            <div
-                class="w-12 h-12 rounded-full bg-brand/10 dark:bg-brand/20 text-brand flex items-center justify-center text-lg mx-auto mb-2.5">
-                <i class="fa-solid fa-link-slash"></i>
-            </div>
-            <h3 class="text-sm font-bold text-neutral-800 dark:text-white">Link Tidak Ditemukan</h3>
-            <p class="text-xs text-neutral-500 dark:text-neutral-400 mt-1">
-                Nomor atau kata kunci yang kamu cari belum ada.
-            </p>
-            <button onclick="resetFilters()"
-                class="mt-3 px-4 py-2 rounded-xl bg-brand hover:bg-brand/90 text-white text-xs font-semibold transition">
-                Tampilkan Semua Link
-            </button>
+        <div id="emptyState" class="empty" hidden>
+            <p id="emptyMessage">Nomor atau nama itu belum ada di nota ini. Cek lagi nomornya di video.</p>
+            <button type="button" id="emptyButton" onclick="resetFilters()">Tampilkan semua barang</button>
         </div>
 
-        <!-- Footer -->
-        <footer class="mt-10 pt-4 text-center">
-            <div
-                class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/70 dark:bg-neutral-900/70 border border-neutral-200/60 dark:border-neutral-800 text-[11px] text-neutral-500 dark:text-neutral-400 shadow-sm">
-                <i class="fa-solid fa-bolt text-brand"></i>
-                <span>Powered by <strong id="footerBrand">rumah.ansaka</strong></span>
+        <div class="total"><span>Jumlah barang</span><span id="linkCountText">…</span></div>
+
+        <footer>
+            <div class="sign">
+                <div class="sign-off">
+                    <span>Hormat kami,</span>
+                    <span class="stamp"><span id="stampName">Rumah Ansaka</span><small>gang, Jakarta Selatan</small></span>
+                </div>
             </div>
-            <p class="mt-2.5 px-4 text-[10px] leading-relaxed text-neutral-400 dark:text-neutral-500">
-                Link di halaman ini adalah link affiliate.
-            </p>
+            <p class="fine">Link di halaman ini adalah link affiliate.</p>
         </footer>
     </div>
 
-    <!-- Toast Notification -->
-    <div id="toastContainer"
-        class="fixed bottom-5 left-1/2 -translate-x-1/2 z-50 pointer-events-none transition-all duration-300 opacity-0 translate-y-4 w-max max-w-[90vw]">
-        <div
-            class="bg-neutral-900 dark:bg-white text-white dark:text-neutral-900 px-4 py-2.5 rounded-full shadow-xl text-xs font-semibold flex items-center gap-2">
-            <i class="fa-solid fa-circle-check text-emerald-400 dark:text-emerald-600"></i>
-            <span id="toastMessage">Link berhasil disalin!</span>
-        </div>
-    </div>
+    <div id="toastContainer" class="toast" role="status" aria-live="polite"><span id="toastMessage"></span></div>
 
     <script>
         /* ============================================================================
@@ -186,12 +522,11 @@
          * ============================================================================ */
 
         const PROFILE_CONFIG = {
-            brandName: "rumah.ansaka",
-            title: "Rumah Ansaka 🛵",
-            bio: "Rumah 315 juta di gang Jakarta Selatan. Semua barang yang muncul di video ada di bawah, ketik nomor urut (contoh: 001) atau nama barang 👇",
+            title: "Rumah Ansaka",
+            bio: "Rumah 315 juta di gang Jakarta Selatan. Bangun rumah dari awal, cerita anak rantau.",
             avatarUrl: "avatar.jpg",
             socials: [
-                { icon: "fa-brands fa-tiktok", url: "https://www.tiktok.com/@rumah.ansaka", label: "TikTok" }
+                { label: "TikTok", handle: "@rumah.ansaka", url: "https://www.tiktok.com/@rumah.ansaka" }
             ]
         };
 
@@ -200,80 +535,34 @@
 
         let activeCategory = "Semua";
 
-        // Data comes from links.json (editable via /admin/), so escape it before putting it into HTML.
+        // Data comes from KV (editable via /admin/), so escape it before putting it into HTML.
         const esc = value => String(value).replace(/[&<>"']/g, ch => `&#${ch.charCodeAt(0)};`);
 
-        const PLATFORM_CONFIG = {
-            shopee: {
-                name: "Shopee",
-                iconBg: "bg-[#EE4D2D]/10 text-[#EE4D2D] dark:bg-[#EE4D2D]/20 dark:text-orange-400",
-                numberBg: "bg-[#EE4D2D] text-white",
-                hoverBorder: "hover:border-[#EE4D2D] dark:hover:border-orange-500",
-                icon: "fa-solid fa-bag-shopping"
-            },
-            tiktok: {
-                name: "TikTok",
-                iconBg: "bg-neutral-900/10 text-neutral-900 dark:bg-white/15 dark:text-white",
-                numberBg: "bg-neutral-900 dark:bg-white text-white dark:text-neutral-900",
-                hoverBorder: "hover:border-neutral-900 dark:hover:border-white",
-                icon: "fa-brands fa-tiktok"
-            },
-            tokopedia: {
-                name: "Tokopedia",
-                iconBg: "bg-[#00AA5B]/10 text-[#00AA5B] dark:bg-[#00AA5B]/20 dark:text-emerald-400",
-                numberBg: "bg-[#00AA5B] text-white",
-                hoverBorder: "hover:border-[#00AA5B] dark:hover:border-emerald-500",
-                icon: "fa-solid fa-store"
-            },
-            lazada: {
-                name: "Lazada",
-                iconBg: "bg-indigo-600/10 text-indigo-600 dark:bg-indigo-500/20 dark:text-indigo-400",
-                numberBg: "bg-indigo-600 text-white",
-                hoverBorder: "hover:border-indigo-600 dark:hover:border-indigo-400",
-                icon: "fa-solid fa-cart-shopping"
-            },
-            umum: {
-                name: "Link",
-                iconBg: "bg-blue-500/10 text-blue-600 dark:bg-blue-500/20 dark:text-blue-400",
-                numberBg: "bg-blue-600 text-white",
-                hoverBorder: "hover:border-blue-500",
-                icon: "fa-solid fa-arrow-up-right-from-square"
-            }
+        const PLATFORM_NAMES = {
+            shopee: "Shopee",
+            tiktok: "TikTok",
+            tokopedia: "Tokopedia",
+            lazada: "Lazada",
+            umum: "Lainnya"
         };
 
         function initProfile() {
-            document.getElementById('footerBrand').textContent = PROFILE_CONFIG.brandName;
             document.getElementById('profileTitle').textContent = PROFILE_CONFIG.title;
+            document.getElementById('stampName').textContent = PROFILE_CONFIG.title;
             document.getElementById('profileBio').textContent = PROFILE_CONFIG.bio;
             document.getElementById('profileAvatar').src = PROFILE_CONFIG.avatarUrl;
 
-            const socialContainer = document.getElementById('socialLinksContainer');
-            socialContainer.innerHTML = PROFILE_CONFIG.socials.map(soc => `
-                <a href="${soc.url}" target="_blank" rel="noopener noreferrer" 
-                   aria-label="${soc.label}" title="${soc.label}"
-                   class="w-9 h-9 rounded-full bg-white dark:bg-neutral-800 border border-neutral-200/80 dark:border-neutral-700 text-neutral-700 dark:text-neutral-200 flex items-center justify-center active:scale-95 hover:scale-110 hover:text-brand transition shadow-sm">
-                    <i class="${soc.icon} text-sm"></i>
-                </a>
-            `).join('');
+            document.getElementById('socialLinksContainer').innerHTML = PROFILE_CONFIG.socials.map(soc =>
+                `${esc(soc.label)} <a href="${esc(soc.url)}" target="_blank" rel="noopener noreferrer">${esc(soc.handle)}</a>`
+            ).join('<br>');
         }
 
         function renderCategories() {
             const uniqueCategories = ["Semua", ...new Set(LINKS_DATA.map(item => item.category).filter(Boolean))];
-            const container = document.getElementById('categoryContainer');
-
-            container.innerHTML = uniqueCategories.map(cat => {
-                const isActive = cat === activeCategory;
-                const activeClasses = isActive
-                    ? "bg-neutral-900 dark:bg-white text-white dark:text-neutral-900 border-neutral-900 dark:border-white shadow-sm"
-                    : "bg-white dark:bg-neutral-800 text-neutral-600 dark:text-neutral-300 border-neutral-200/90 dark:border-neutral-700 hover:border-neutral-400";
-
-                return `
-                    <button data-category="${esc(cat)}" onclick="selectCategory(this.dataset.category)"
-                            class="px-3.5 py-1.5 rounded-full text-xs font-semibold whitespace-nowrap border active:scale-95 transition ${activeClasses}">
-                        ${esc(cat)}
-                    </button>
-                `;
-            }).join('');
+            document.getElementById('categoryContainer').innerHTML = uniqueCategories.map(cat => `
+                <button type="button" class="tick" aria-pressed="${cat === activeCategory}"
+                        data-category="${esc(cat)}" onclick="selectCategory(this.dataset.category)">${esc(cat)}</button>
+            `).join('');
         }
 
         function selectCategory(category) {
@@ -284,13 +573,7 @@
 
         function filterLinks() {
             const query = document.getElementById('searchInput').value.trim().toLowerCase();
-            const clearBtn = document.getElementById('clearSearchBtn');
-
-            if (query.length > 0) {
-                clearBtn.classList.remove('hidden');
-            } else {
-                clearBtn.classList.add('hidden');
-            }
+            document.getElementById('clearSearchBtn').hidden = query.length === 0;
 
             const filtered = LINKS_DATA.filter(item => {
                 const matchesCategory = activeCategory === "Semua" || item.category === activeCategory;
@@ -305,68 +588,21 @@
         }
 
         function renderLinksList(links) {
-            const listContainer = document.getElementById('linksListContainer');
-            const emptyState = document.getElementById('emptyState');
-            const countText = document.getElementById('linkCountText');
+            document.getElementById('linkCountText').textContent = links.length;
+            document.getElementById('emptyState').hidden = links.length > 0;
 
-            countText.textContent = `Menampilkan ${links.length} link produk`;
-
-            if (links.length === 0) {
-                listContainer.innerHTML = "";
-                emptyState.classList.remove('hidden');
-                return;
-            }
-
-            emptyState.classList.add('hidden');
-
-            listContainer.innerHTML = links.map(item => {
-                const plat = PLATFORM_CONFIG[item.platform] || PLATFORM_CONFIG.shopee;
-
-                return `
-                <div class="group relative flex items-center bg-white dark:bg-neutral-800/90 rounded-2xl border border-neutral-200/90 dark:border-neutral-700/80 shadow-sm hover:shadow-md ${plat.hoverBorder} transition-all duration-150 active:scale-[0.99]">
-                    <!-- Main Clickable Link Area -->
-                    <a href="${esc(item.url)}" target="_blank" rel="noopener noreferrer" 
-                       class="flex-1 flex items-center gap-3 p-3 min-w-0">
-                        
-                        <!-- Number Badge (#001) -->
-                        <div class="shrink-0 px-2.5 py-2.5 rounded-xl font-extrabold text-xs tracking-tight shadow-sm flex items-center justify-center min-w-[48px] ${plat.numberBg}">
-                            #${esc(item.number)}
-                        </div>
-
-                        <!-- Link Text & Metadata -->
-                        <div class="flex-1 min-w-0">
-                            <div class="flex items-center gap-1.5 mb-0.5">
-                                <span class="inline-flex items-center gap-1 text-[10px] font-bold px-1.5 py-0.5 rounded-md ${plat.iconBg}">
-                                    <i class="${plat.icon} text-[9px]"></i> ${plat.name}
-                                </span>
-                                ${item.badge ? `
-                                <span class="text-[10px] font-bold px-1.5 py-0.5 rounded-md bg-rose-500/10 text-rose-600 dark:bg-rose-500/20 dark:text-rose-300">
-                                    ${esc(item.badge)}
-                                </span>
-                                ` : ''}
-                            </div>
-                            <h2 class="text-xs sm:text-[13px] font-bold text-neutral-800 dark:text-neutral-100 leading-snug line-clamp-2 group-hover:text-brand transition-colors">
-                                ${esc(item.title)}
-                            </h2>
-                        </div>
+            document.getElementById('linksListContainer').innerHTML = links.map(item => `
+                <li class="row">
+                    <a href="${esc(item.url)}" target="_blank" rel="noopener noreferrer">
+                        <span class="no">${esc(item.number)}</span>
+                        <span class="item">${esc(item.title)}${item.badge ? ` <em>${esc(item.badge)}</em>` : ''}</span>
+                        <span class="shop">${esc(PLATFORM_NAMES[item.platform] || PLATFORM_NAMES.umum)}</span>
                     </a>
-
-                    <!-- Right Actions: Copy Link & Arrow -->
-                    <div class="flex items-center pr-2 gap-0.5 shrink-0">
-                        <button data-url="${esc(item.url)}" data-message="Link #${esc(item.number)} berhasil disalin!"
-                                onclick="copyTextToClipboard(this.dataset.url, this.dataset.message)"
-                                title="Salin Link" aria-label="Salin Link"
-                                class="w-8 h-8 rounded-xl text-neutral-400 hover:text-neutral-700 dark:hover:text-white active:bg-neutral-100 dark:active:bg-neutral-700 flex items-center justify-center transition">
-                            <i class="fa-regular fa-copy text-xs"></i>
-                        </button>
-                        <a href="${esc(item.url)}" target="_blank" rel="noopener noreferrer" aria-label="Buka Link"
-                           class="w-6 h-8 flex items-center justify-center text-neutral-400 group-hover:text-neutral-700 dark:group-hover:text-white transition-all">
-                            <i class="fa-solid fa-chevron-right text-xs"></i>
-                        </a>
-                    </div>
-                </div>
-                `;
-            }).join('');
+                    <button type="button" class="copy" data-url="${esc(item.url)}" data-message="Link ${esc(item.number)} disalin"
+                            onclick="copyTextToClipboard(this.dataset.url, this.dataset.message)"
+                            aria-label="Salin link ${esc(item.number)}">salin</button>
+                </li>
+            `).join('');
         }
 
         function clearSearch() {
@@ -388,54 +624,43 @@
             tempInput.select();
             try {
                 document.execCommand("copy");
-                showToast(successMsg || "Berhasil disalin!");
+                showToast(successMsg || "Disalin");
             } catch (err) {
-                showToast("Gagal menyalin teks");
+                showToast("Link gagal disalin");
             }
             document.body.removeChild(tempInput);
         }
 
         function shareCurrentPage() {
-            copyTextToClipboard(window.location.href, "Link halaman bio berhasil disalin!");
+            if (navigator.share) {
+                navigator.share({ title: document.title, url: location.href }).catch(() => { });
+                return;
+            }
+            copyTextToClipboard(location.href, "Link halaman ini disalin");
         }
 
         let toastTimeout;
         function showToast(message) {
             const toast = document.getElementById('toastContainer');
             document.getElementById('toastMessage').textContent = message;
-
-            toast.classList.remove('opacity-0', 'translate-y-4');
-            toast.classList.add('opacity-100', 'translate-y-0');
-
+            toast.classList.add('show');
             clearTimeout(toastTimeout);
-            toastTimeout = setTimeout(() => {
-                toast.classList.add('opacity-0', 'translate-y-4');
-                toast.classList.remove('opacity-100', 'translate-y-0');
-            }, 2500);
+            toastTimeout = setTimeout(() => toast.classList.remove('show'), 2500);
+        }
+
+        function updateThemeButton() {
+            document.getElementById('themeBtn').textContent =
+                document.documentElement.classList.contains('dark') ? 'Mode terang' : 'Mode gelap';
         }
 
         function toggleTheme() {
-            const htmlEl = document.documentElement;
-            const iconEl = document.getElementById('themeIcon');
-
-            if (htmlEl.classList.contains('dark')) {
-                htmlEl.classList.remove('dark');
-                iconEl.className = 'fa-solid fa-moon text-xs';
-                localStorage.setItem('theme', 'light');
-            } else {
-                htmlEl.classList.add('dark');
-                iconEl.className = 'fa-solid fa-sun text-xs text-amber-400';
-                localStorage.setItem('theme', 'dark');
-            }
+            const isDark = document.documentElement.classList.toggle('dark');
+            try { localStorage.setItem('theme', isDark ? 'dark' : 'light'); } catch (e) { }
+            updateThemeButton();
         }
 
         window.onload = async function () {
-            if (localStorage.getItem('theme') === 'dark' ||
-                (!localStorage.getItem('theme') && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
-                document.documentElement.classList.add('dark');
-                document.getElementById('themeIcon').className = 'fa-solid fa-sun text-xs text-amber-400';
-            }
-
+            updateThemeButton();
             initProfile();
             try {
                 // links.json is only the seed copy, for hosts without Cloudflare Functions (e.g. GitHub Pages).
@@ -443,7 +668,12 @@
                     .then(res => res.ok ? res : fetch('links.json'))
                     .then(res => res.json());
             } catch (err) {
-                document.getElementById('linkCountText').textContent = 'Gagal memuat link, coba muat ulang halaman.';
+                document.getElementById('linkCountText').textContent = '-';
+                document.getElementById('emptyMessage').textContent = 'Daftar barang gagal dimuat. Periksa koneksi, lalu muat ulang halaman.';
+                const retry = document.getElementById('emptyButton');
+                retry.textContent = 'Muat ulang';
+                retry.onclick = () => location.reload();
+                document.getElementById('emptyState').hidden = false;
                 return;
             }
             renderCategories();
