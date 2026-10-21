@@ -182,7 +182,7 @@
         /* ============================================================================
          * PANDUAN EDIT UNTUK PEMILIK WEBSITE:
          * 1. Ubah nama, bio, dan sosmed di bagian PROFILE_CONFIG.
-         * 2. Tambah/ubah link affiliate lewat halaman /admin/ (data tersimpan di links.json).
+         * 2. Tambah/ubah link affiliate lewat halaman /admin/ (data tersimpan di Cloudflare KV).
          * ============================================================================ */
 
         const PROFILE_CONFIG = {
@@ -195,7 +195,7 @@
             ]
         };
 
-        // Diisi dari links.json saat halaman dibuka. Kelola lewat /admin/.
+        // Diisi dari /api/links saat halaman dibuka. Kelola lewat /admin/.
         let LINKS_DATA = [];
 
         let activeCategory = "Semua";
@@ -438,7 +438,10 @@
 
             initProfile();
             try {
-                LINKS_DATA = await fetch('links.json', { cache: 'no-cache' }).then(res => res.json());
+                // links.json is only the seed copy, for hosts without Cloudflare Functions (e.g. GitHub Pages).
+                LINKS_DATA = await fetch('/api/links', { cache: 'no-cache' })
+                    .then(res => res.ok ? res : fetch('links.json'))
+                    .then(res => res.json());
             } catch (err) {
                 document.getElementById('linkCountText').textContent = 'Gagal memuat link, coba muat ulang halaman.';
                 return;

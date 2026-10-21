@@ -1,12 +1,18 @@
-// Admin API for /admin/: reads and saves links.json in the GitHub repo.
-// Every save is a commit, which makes Cloudflare Pages redeploy, so the public page stays a static file.
-// Needs Cloudflare Pages variables ADMIN_USERNAME, ADMIN_PASSWORD and GITHUB_TOKEN (fine-grained, Contents read/write on this repo).
+// Admin API for /admin/: reads and saves the link list in Cloudflare KV (binding LINKS, key "links").
+// Needs Cloudflare Pages variables ADMIN_USERNAME and ADMIN_PASSWORD, plus the KV namespace binding LINKS.
 
-const FILE_URL = 'https://api.github.com/repos/Andrepjt/ansaka/contents/links.json';
 const FIELDS = ['number', 'title', 'category', 'platform', 'badge', 'url'];
 const PLATFORMS = ['shopee', 'tiktok', 'tokopedia', 'lazada', 'umum'];
 
 const json = (data, status = 200) => Response.json(data, { status });
+
+// Until the first save (or before LINKS is bound), the list comes from the static links.json seed.
+export async function readLinks(env, request) {
+    const saved = env.LINKS && await env.LINKS.get('links', 'json');
+    if (saved) return saved;
+    const res = await env.ASSETS.fetch(new URL('/links.json', request.url));
+    return res.ok ? res.json() : [];
+}
 
 // Hash both sides so timingSafeEqual gets equal-length inputs.
 async function same(a, b) {
@@ -15,35 +21,15 @@ async function same(a, b) {
 }
 
 async function checkAccess(request, env) {
-    const missing = ['ADMIN_USERNAME', 'ADMIN_PASSWORD', 'GITHUB_TOKEN'].filter(name => !env[name]);
+    const missing = ['ADMIN_USERNAME', 'ADMIN_PASSWORD'].filter(name => !env[name]);
     if (missing.length) return json({ error: `Variable ${missing.join(', ')} belum di-set di Cloudflare Pages.` }, 500);
+    if (!env.LINKS) return json({ error: 'KV namespace belum disambungkan dengan nama LINKS di Cloudflare Pages.' }, 500);
 
     // The admin page sends "user:pass" with each part URI-encoded: header values must be ASCII, and ":" can't appear inside a part.
     const [user = '', pass = ''] = (request.headers.get('Authorization') || '').replace(/^Bearer /, '').split(':');
     const okUser = await same(user, encodeURIComponent(env.ADMIN_USERNAME));
     const okPass = await same(pass, encodeURIComponent(env.ADMIN_PASSWORD));
     return okUser && okPass ? null : json({ error: 'Username atau password salah.' }, 401);
-}
-
-function github(env, init = {}) {
-    return fetch(FILE_URL, {
-        ...init,
-        headers: {
-            Authorization: `Bearer ${env.GITHUB_TOKEN}`,
-            Accept: 'application/vnd.github+json',
-            'User-Agent': 'rumah-ansaka-admin',
-        },
-    });
-}
-
-function decodeBase64(base64) {
-    return new TextDecoder().decode(Uint8Array.from(atob(base64), ch => ch.charCodeAt(0)));
-}
-
-function encodeBase64(text) {
-    let binary = '';
-    for (const byte of new TextEncoder().encode(text)) binary += String.fromCharCode(byte);
-    return btoa(binary);
 }
 
 function validate(links) {
@@ -64,11 +50,7 @@ function validate(links) {
 export async function onRequestGet({ request, env }) {
     const denied = await checkAccess(request, env);
     if (denied) return denied;
-
-    const res = await github(env);
-    if (!res.ok) return json({ error: `Gagal membaca links.json dari GitHub (${res.status}).` }, 502);
-    const file = await res.json();
-    return json({ sha: file.sha, links: JSON.parse(decodeBase64(file.content)) });
+    return json({ links: await readLinks(env, request) });
 }
 
 export async function onRequestPut({ request, env }) {
@@ -85,17 +67,6 @@ export async function onRequestPut({ request, env }) {
     if (problem) return json({ error: problem }, 400);
 
     const links = body.links.map(item => Object.fromEntries(FIELDS.map(field => [field, item[field].trim()])));
-    const res = await github(env, {
-        method: 'PUT',
-        body: JSON.stringify({
-            message: String(body.message || 'Update link dari admin').slice(0, 100),
-            content: encodeBase64(JSON.stringify(links, null, 4) + '\n'),
-            sha: body.sha,
-            branch: 'main',
-        }),
-    });
-    // GitHub rejects a stale sha, so a save never silently overwrites changes made elsewhere.
-    if (res.status === 409) return json({ error: 'links.json sudah berubah di tempat lain. Muat ulang halaman admin dulu.' }, 409);
-    if (!res.ok) return json({ error: `Gagal menyimpan ke GitHub (${res.status}).` }, 502);
-    return json({ sha: (await res.json()).content.sha, links });
+    await env.LINKS.put('links', JSON.stringify(links));
+    return json({ links });
 }

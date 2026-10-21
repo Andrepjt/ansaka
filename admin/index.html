@@ -123,7 +123,6 @@
         const esc = value => String(value).replace(/[&<>"']/g, ch => `&#${ch.charCodeAt(0)};`);
 
         let links = [];
-        let sha = null;
         let editingIndex = -1;
         let auth = ''; // "user:pass", each part URI-encoded (see functions/admin/api.js)
         try { auth = localStorage.getItem('adminAuth') || ''; } catch (e) { }
@@ -156,9 +155,7 @@
             $('loginBtn').disabled = true;
             $('loginBtn').textContent = 'Memuat...';
             try {
-                const data = await api('GET');
-                links = data.links;
-                sha = data.sha;
+                links = (await api('GET')).links;
             } catch (err) {
                 if (err.status === 401) {
                     try { localStorage.removeItem('adminAuth'); } catch (e) { }
@@ -225,15 +222,13 @@
             form.scrollIntoView({ behavior: 'smooth' });
         }
 
-        async function save(newLinks, message) {
+        async function save(newLinks) {
             $('saveBtn').disabled = true;
             setStatus('Menyimpan...');
             try {
-                const data = await api('PUT', { links: newLinks, sha, message });
-                links = data.links;
-                sha = data.sha;
+                links = (await api('PUT', { links: newLinks })).links;
                 render();
-                setStatus('Tersimpan ✓ Situs ter-update dalam ±1 menit.', 'ok');
+                setStatus('Tersimpan ✓ Tampil di situs dalam beberapa detik (paling lama ±1 menit).', 'ok');
                 return true;
             } catch (err) {
                 setStatus(err.message, 'error');
@@ -255,13 +250,13 @@
             const isNew = editingIndex === -1;
             const newLinks = [...links];
             if (isNew) newLinks.unshift(item); else newLinks[editingIndex] = item;
-            if (await save(newLinks, `${isNew ? 'Tambah' : 'Edit'} link #${item.number}`)) resetForm();
+            if (await save(newLinks)) resetForm();
         };
 
         async function deleteItem(index) {
             const item = links[index];
             if (!confirm(`Hapus #${item.number} ${item.title}?`)) return;
-            if (await save(links.filter((_, i) => i !== index), `Hapus link #${item.number}`) && editingIndex !== -1) resetForm();
+            if (await save(links.filter((_, i) => i !== index)) && editingIndex !== -1) resetForm();
         }
 
         async function saveJson() {
@@ -271,7 +266,7 @@
             } catch (err) {
                 return setStatus('JSON tidak valid: ' + err.message, 'error');
             }
-            if (await save(parsed, 'Edit JSON dari admin')) resetForm();
+            if (await save(parsed)) resetForm();
         }
 
         $('loginForm').onsubmit = event => {
